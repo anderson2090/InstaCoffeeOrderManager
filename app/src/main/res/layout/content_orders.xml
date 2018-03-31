@@ -8,9 +8,11 @@
     tools:context="com.sweetdeveloper.instacoffeeordermanager.OrdersActivity"
     tools:showIn="@layout/app_bar_orders">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="Orders Activity" />
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/pending_orders_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+    </android.support.v7.widget.RecyclerView>
 </RelativeLayout>
