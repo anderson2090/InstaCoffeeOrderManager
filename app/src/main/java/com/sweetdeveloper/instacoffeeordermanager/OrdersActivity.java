@@ -1,5 +1,6 @@
 package com.sweetdeveloper.instacoffeeordermanager;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -12,9 +13,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class OrdersActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
+
+    FirebaseAuth firebaseAuth;
+    FirebaseUser firebaseUser;
+
+    TextView userNameTextView;
+    TextView userEmailTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,6 +33,9 @@ public class OrdersActivity extends AppCompatActivity
         setContentView(R.layout.activity_orders);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -40,6 +54,15 @@ public class OrdersActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        View headerView = navigationView.getHeaderView(0);
+        userNameTextView = headerView.findViewById(R.id.header_user_name_text_view);
+        userEmailTextView = headerView.findViewById(R.id.header_user_email_text_view);
+        if (firebaseUser != null) {
+            userNameTextView.setText(firebaseUser.getDisplayName());
+            userEmailTextView.setText(firebaseUser.getEmail());
+
+        }
     }
 
     @Override
@@ -80,18 +103,12 @@ public class OrdersActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_pending_orders) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-
-        } else if (id == R.id.nav_slideshow) {
-
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
-
+        } else if (id == R.id.nav_signout) {
+            firebaseAuth.signOut();
+            startActivity(new Intent(getApplicationContext(), LoginActivity.class));
+            finish();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
