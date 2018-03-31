@@ -8,6 +8,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -67,8 +68,14 @@ public class OrdersActivity extends AppCompatActivity
                 ArrayList<PendingOrder> pendingOrders = new ArrayList<>();
                 for (DataSnapshot child : dataSnapshot.getChildren()) {
                     PendingOrder order = child.getValue(PendingOrder.class);
+                    String key = child.getKey();
+
+                    if (order != null) {
+                        order.setKey(key);
+                    }
                     pendingOrders.add(order);
                 }
+
                 recyclerView = findViewById(R.id.pending_orders_recycler_view);
                 layoutManager = new LinearLayoutManager(getApplicationContext());
                 recyclerView.setLayoutManager(layoutManager);
@@ -247,6 +254,7 @@ public class OrdersActivity extends AppCompatActivity
                         Intent intent = new Intent(getApplicationContext(), OrderDetailsActivity.class);
                         intent.putParcelableArrayListExtra("orders", pendingOrders.get(getAdapterPosition()).getOrderItems());
                         intent.putExtra("total", pendingOrders.get(getAdapterPosition()).getTotal());
+                        intent.putExtra("key",pendingOrders.get(getAdapterPosition()).getKey());
                         startActivity(intent);
                     }
                 });

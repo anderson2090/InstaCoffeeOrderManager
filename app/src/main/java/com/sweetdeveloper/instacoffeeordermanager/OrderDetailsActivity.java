@@ -1,5 +1,6 @@
 package com.sweetdeveloper.instacoffeeordermanager;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
@@ -13,19 +14,30 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.sweetdeveloper.instacoffeeordermanager.models.OrderItem;
 
 import java.util.ArrayList;
 
 public class OrderDetailsActivity extends AppCompatActivity {
 
+    TextView totalTextView;
+    Button confirmButton;
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
     OrderDetailsRecyclerViewAdapter adapter;
     Parcelable listState;
     ArrayList<OrderItem> orderItems = new ArrayList<>();
+    FirebaseDatabase firebaseDatabase;
+    DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,12 +46,17 @@ public class OrderDetailsActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        firebaseDatabase = FirebaseDatabase.getInstance();
+
+        confirmButton = findViewById(R.id.confirm_button);
+        totalTextView = findViewById(R.id.total_text_view);
         Bundle bundle = getIntent().getExtras();
         if (bundle != null) {
             orderItems = bundle.getParcelableArrayList("orders");
+            totalTextView.setText(bundle.getString("total"));
 
         }
-
+        databaseReference = firebaseDatabase.getReference("pending_orders").child(bundle.getString("key"));
         recyclerView = findViewById(R.id.order_details_recycler_view);
         layoutManager = new LinearLayoutManager(this);
         adapter = new OrderDetailsRecyclerViewAdapter(orderItems);
@@ -49,15 +66,27 @@ public class OrderDetailsActivity extends AppCompatActivity {
         if (savedInstanceState != null) {
             layoutManager.onRestoreInstanceState(listState);
         }
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                databaseReference.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Toast.makeText(getApplicationContext(), getString(R.string.order_confirmed), Toast.LENGTH_SHORT).show();
+                            startActivity(new Intent(getApplicationContext(), OrdersActivity.class));
+                            finish();
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Toast.makeText(getApplicationContext(), e.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         });
+
     }
 
     @Override

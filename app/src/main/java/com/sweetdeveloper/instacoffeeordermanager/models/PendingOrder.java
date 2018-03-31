@@ -10,6 +10,7 @@ public class PendingOrder {
     private ArrayList<OrderItem> orderItems;
     private String phone;
     private String total;
+    private String key;
 
     public PendingOrder() {
     }
@@ -21,6 +22,14 @@ public class PendingOrder {
         this.orderItems = orderItems;
         this.phone = phone;
         this.total = total;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public String getAddress() {
