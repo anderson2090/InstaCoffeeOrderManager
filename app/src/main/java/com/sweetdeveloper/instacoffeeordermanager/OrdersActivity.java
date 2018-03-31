@@ -244,7 +244,10 @@ public class OrdersActivity extends AppCompatActivity
                 itemView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        startActivity(new Intent(getApplicationContext(), OrderDetailsActivity.class));
+                        Intent intent = new Intent(getApplicationContext(), OrderDetailsActivity.class);
+                        intent.putParcelableArrayListExtra("orders", pendingOrders.get(getAdapterPosition()).getOrderItems());
+                        intent.putExtra("total", pendingOrders.get(getAdapterPosition()).getTotal());
+                        startActivity(intent);
                     }
                 });
             }

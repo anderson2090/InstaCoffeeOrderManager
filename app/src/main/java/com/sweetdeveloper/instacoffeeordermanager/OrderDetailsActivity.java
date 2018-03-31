@@ -9,10 +9,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+
+import com.sweetdeveloper.instacoffeeordermanager.models.OrderItem;
 
 import java.util.ArrayList;
 
@@ -22,6 +25,7 @@ public class OrderDetailsActivity extends AppCompatActivity {
     RecyclerView.LayoutManager layoutManager;
     OrderDetailsRecyclerViewAdapter adapter;
     Parcelable listState;
+    ArrayList<OrderItem> orderItems = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,9 +34,15 @@ public class OrderDetailsActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            orderItems = bundle.getParcelableArrayList("orders");
+
+        }
+
         recyclerView = findViewById(R.id.order_details_recycler_view);
         layoutManager = new LinearLayoutManager(this);
-        adapter = new OrderDetailsRecyclerViewAdapter();
+        adapter = new OrderDetailsRecyclerViewAdapter(orderItems);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(adapter);
 
@@ -79,12 +89,10 @@ public class OrderDetailsActivity extends AppCompatActivity {
 
     class OrderDetailsRecyclerViewAdapter extends RecyclerView.Adapter<OrderDetailsRecyclerViewAdapter.ViewHolder> {
 
-        ArrayList<String> items = new ArrayList<>();
+        ArrayList<OrderItem> items = new ArrayList<>();
 
-        OrderDetailsRecyclerViewAdapter() {
-            for (int i = 0; i <= 100; i++) {
-                items.add(i + "");
-            }
+        OrderDetailsRecyclerViewAdapter(ArrayList<OrderItem> items) {
+            this.items = items;
         }
 
         @NonNull
@@ -97,7 +105,9 @@ public class OrderDetailsActivity extends AppCompatActivity {
 
         @Override
         public void onBindViewHolder(@NonNull OrderDetailsRecyclerViewAdapter.ViewHolder holder, int position) {
-            holder.itemName.setText(items.get(position));
+            holder.itemName.setText(items.get(position).getItemName());
+            holder.itemPrice.setText(items.get(position).getPrice());
+            holder.itemQuantity.setText(items.get(position).getQuantity());
         }
 
         @Override
