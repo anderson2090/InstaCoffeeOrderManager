@@ -2,6 +2,7 @@ package com.sweetdeveloper.instacoffeeordermanager;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -23,6 +24,8 @@ import android.widget.TextView;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
+import java.util.ArrayList;
+
 public class OrdersActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -35,6 +38,8 @@ public class OrdersActivity extends AppCompatActivity
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
     PendingOrdersRecyclerViewAdapter adapter;
+
+    Parcelable listState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +54,9 @@ public class OrdersActivity extends AppCompatActivity
         recyclerView.setLayoutManager(layoutManager);
         adapter = new PendingOrdersRecyclerViewAdapter();
         recyclerView.setAdapter(adapter);
+        if (savedInstanceState != null) {
+            layoutManager.onRestoreInstanceState(listState);
+        }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -129,9 +137,42 @@ public class OrdersActivity extends AppCompatActivity
         return true;
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        if (layoutManager != null) {
+            listState = layoutManager.onSaveInstanceState();
+            outState.putParcelable("state", listState);
+        }
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null) {
+            listState = savedInstanceState.getParcelable("state");
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (layoutManager != null) {
+            if (listState != null) {
+                layoutManager.onRestoreInstanceState(listState);
+            }
+        }
+    }
+
     class PendingOrdersRecyclerViewAdapter extends RecyclerView.Adapter<PendingOrdersRecyclerViewAdapter.ViewHolder> {
 
-        String[] items = {"One", "Two", "Three"};
+        ArrayList<String> items = new ArrayList<>();
+
+        PendingOrdersRecyclerViewAdapter() {
+            for (int i = 0; i <= 100; i++) {
+                items.add(i + "");
+            }
+        }
 
         @NonNull
         @Override
@@ -146,12 +187,12 @@ public class OrdersActivity extends AppCompatActivity
 
         @Override
         public void onBindViewHolder(@NonNull PendingOrdersRecyclerViewAdapter.ViewHolder holder, int position) {
-            holder.userNameTextView.setText(items[position]);
+            holder.userNameTextView.setText(items.get(position));
         }
 
         @Override
         public int getItemCount() {
-            return items.length;
+            return items.size();
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {
