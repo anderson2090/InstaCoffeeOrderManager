@@ -23,6 +23,12 @@ import android.widget.TextView;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.sweetdeveloper.instacoffeeordermanager.models.PendingOrder;
 
 import java.util.ArrayList;
 
@@ -31,6 +37,9 @@ public class OrdersActivity extends AppCompatActivity
 
     FirebaseAuth firebaseAuth;
     FirebaseUser firebaseUser;
+
+    FirebaseDatabase firebaseDatabase;
+    DatabaseReference databaseReference;
 
     TextView userNameTextView;
     TextView userEmailTextView;
@@ -42,21 +51,40 @@ public class OrdersActivity extends AppCompatActivity
     Parcelable listState;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_orders);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
-        recyclerView = findViewById(R.id.pending_orders_recycler_view);
-        layoutManager = new LinearLayoutManager(this);
-        recyclerView.setLayoutManager(layoutManager);
-        adapter = new PendingOrdersRecyclerViewAdapter();
-        recyclerView.setAdapter(adapter);
-        if (savedInstanceState != null) {
-            layoutManager.onRestoreInstanceState(listState);
-        }
+
+        firebaseDatabase = FirebaseDatabase.getInstance();
+        databaseReference = firebaseDatabase.getReference("pending_orders");
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                ArrayList<PendingOrder> pendingOrders = new ArrayList<>();
+                for (DataSnapshot child : dataSnapshot.getChildren()) {
+                    PendingOrder order = child.getValue(PendingOrder.class);
+                    pendingOrders.add(order);
+                }
+                recyclerView = findViewById(R.id.pending_orders_recycler_view);
+                layoutManager = new LinearLayoutManager(getApplicationContext());
+                recyclerView.setLayoutManager(layoutManager);
+                adapter = new PendingOrdersRecyclerViewAdapter(pendingOrders);
+                recyclerView.setAdapter(adapter);
+                if (savedInstanceState != null) {
+                    layoutManager.onRestoreInstanceState(listState);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -166,12 +194,10 @@ public class OrdersActivity extends AppCompatActivity
 
     class PendingOrdersRecyclerViewAdapter extends RecyclerView.Adapter<PendingOrdersRecyclerViewAdapter.ViewHolder> {
 
-        ArrayList<String> items = new ArrayList<>();
+        ArrayList<PendingOrder> pendingOrders = new ArrayList<>();
 
-        PendingOrdersRecyclerViewAdapter() {
-            for (int i = 0; i <= 100; i++) {
-                items.add(i + "");
-            }
+        PendingOrdersRecyclerViewAdapter(ArrayList<PendingOrder> pendingOrders) {
+            this.pendingOrders = pendingOrders;
         }
 
         @NonNull
@@ -187,12 +213,15 @@ public class OrdersActivity extends AppCompatActivity
 
         @Override
         public void onBindViewHolder(@NonNull PendingOrdersRecyclerViewAdapter.ViewHolder holder, int position) {
-            holder.userNameTextView.setText(items.get(position));
+            holder.userNameTextView.setText(pendingOrders.get(position).getName());
+            holder.userEmailTextView.setText(pendingOrders.get(position).getEmail());
+            holder.userPhoneTextView.setText(pendingOrders.get(position).getPhone());
+            holder.userAddressTextView.setText(pendingOrders.get(position).getAddress());
         }
 
         @Override
         public int getItemCount() {
-            return items.size();
+            return pendingOrders.size();
         }
 
         class ViewHolder extends RecyclerView.ViewHolder {
@@ -212,6 +241,12 @@ public class OrdersActivity extends AppCompatActivity
                 userPhoneTextView = itemView.findViewById(R.id.po_user_phone_text_view);
                 userAddressTextView = itemView.findViewById(R.id.po_user_address_text_view);
                 orderTimeTextView = itemView.findViewById(R.id.po_order_time_text_view);
+                itemView.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        startActivity(new Intent(getApplicationContext(), OrderDetailsActivity.class));
+                    }
+                });
             }
         }
     }
