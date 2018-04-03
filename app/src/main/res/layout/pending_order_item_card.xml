@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="12dp"
-    app:cardBackgroundColor="@color/green"
+    app:cardBackgroundColor="@color/colorPrimaryDark"
     app:cardCornerRadius="12dp"
     app:cardElevation="3dp"
     app:contentPadding="4dp"
@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/green"
             android:textSize="16sp"
             tools:text="User Name" />
 
@@ -33,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/po_user_name_text_view"
             android:layout_centerHorizontal="true"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/green"
             android:textSize="16sp"
             tools:text="User Email" />
 
@@ -44,7 +44,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/po_user_email_text_view"
             android:layout_centerHorizontal="true"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/green"
             android:textSize="16sp"
             tools:text="User Phone" />
 
@@ -54,7 +54,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/po_user_phone_text_view"
             android:layout_centerHorizontal="true"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/green"
             android:textSize="16sp"
             tools:text="User Address" />
 
@@ -64,7 +64,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/po_user_address_text_view"
             android:layout_centerHorizontal="true"
-            android:textColor="@color/colorPrimaryDark"
+            android:textColor="@color/green"
             android:textSize="16sp"
             tools:text="Order Time" />
     </RelativeLayout>
